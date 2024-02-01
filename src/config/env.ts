@@ -1,0 +1,13 @@
+
+export const env = {
+    SHOPIFY_HOSTNAME: process.env.SHOPIFY_HOSTNAME,
+    SHOPIFY_API_KEY: process.env.SHOPIFY_API_KEY,
+    MONGO_DB_KEY: process.env.MONGO_DB_KEY,
+    MONGO_DB_TOKEN: process.env.MONGO_DB_TOKEN,
+    MONGO_DB_AUTH:process.env.MONGO_DB_AUTH,
+    NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
+    NEXTAUTH_URL:process.env.NEXTAUTH_URL,
+    MONGO_DB_PRODUCTS_API_KEY:process.env.MONGO_DB_PRODUCTS_API_KEY
+}
+
+

@@ -1,0 +1,344 @@
+<!-- 
+
+para crear un login primero se crea la carpeta de Login, en el se tiene la pagina principal que vive adentro
+de dicha carpeta, se tiene que llamar page.tsx (en el caso de next js), despues se crea en este caso una sub-
+carpeta llamada create account en caso de que el usuario no cuente con una cuenta en la applicacion, se procede
+en hacer la maquetacion de login como de create account, en el archivo de create account se uso formik y yup, 
+para validar el formulario, se importa los componentes de Formik, FormikHelpers, Field, Form, ErrorMessage, 
+para hacer el formulario, en el caso de yup se crea un object schema:
+
+const personSchema = yup.object({
+    userName: yup.string().min(4, 'Name must be at least 4 characters.').required(),
+    email: yup.string().required().email('Invalid email address'),
+    password: yup.string().required()
+}) 
+
+con las validaciones de cada variable y se inserta en el componente Formik como un validation
+
+ejemplo de como hacer el formulario
+
+como se puede ver se importaron los componentes Formik, Form, Field, ErrorMessage y FormikHelpers
+
+ <Formik                   
+    initialValues={initialValues}                                            dentro de Formik, se usa el initalvalues con el objeto de los valores
+    onSubmit={(values: MyformikValues,                                       iniciales, luego en el submit se hace un arrow function con 2 parametros
+        { setSubmitting, resetForm }: FormikHelpers<MyformikValues>          el primero los valores con el tipo de MyformikValues que es una interface
+        ) => {                                                               y el segundo son las acciones, se puede destructurar las acciones en varias
+            setSubmitting(false)                                             funciones o variables se podria decir, en este caso usamos el setSubmitting y
+            dataSubmmitting(values)                                         el resetForm, y el tipado seria el el componente FormikHelper con el tipado
+            resetForm({                                                     MyformikValues, despues se desactiva la recarga de la pagina con el setSubmitting        
+                values: {                                                   se envia los datos con la funcion que crees, ver linea 64 y en los parametros se envian
+                    username: '',                                           los valores y despues se resetea el formulario con el resetForm, y para terminar
+                    email: '',                                              con el validationSchema validamos la info que envia el usuario para saber si estan 
+                    password: ''                                            haciendo bien la solicitud " OJO, DEBES USAR LA PROPIEDAD NAME EN LOS FIELDS O TE DARA ERROR   "
+                }
+            })
+        }
+    }
+    validationSchema={personSchema (ver linea 10)} 
+    >
+        <Form className="w-96 rounded-xl shadow-4xl bg-black/5 p-8">
+            <h1 className="text-4xl font-bold py-2">Register</h1>
+            <div className="flex flex-col py-2">
+                <label htmlFor="username" className="text-lg font-semibold">UserName:</label>
+                <Field type="text" id="username" name="username" className="border px-2 py-1 rounded-lg" placeholder="nombre"/>
+                <ErrorMessage name='username' />
+            </div>
+            <div className="flex flex-col py-2">
+                <label htmlFor="email" className="text-lg font-semibold">Email:</label>
+                <Field type="email" id="email" name="email" className="border px-2 py-1 rounded-lg" placeholder="correo"/>
+                <ErrorMessage name='email'/>
+            </div>
+            <div className="flex flex-col py-2">
+                <label htmlFor="password" className="text-lg font-semibold">Password:</label>
+                <Field type="password" id="password" name="password" className="border px-2 py-1 rounded-lg" placeholder="contraseña"/>
+                <ErrorMessage name='password'/>
+            </div>
+            <button className='bg-teal-500 w-full py-2 rounded-xl mt-4 mb-2 hover:scale-105 transition duration-300' type="submit">Registrarse</button>
+            <Link href={'/login'}>
+                <button className='bg-red-500 w-full py-2 rounded-xl mt-2 hover:scale-105 transition duration-300'>Cancelar</button>
+            </Link>
+        </Form>
+</Formik> 
+
+FUNCION PARA ENVIAR DATOS
+
+const dataSubmmitting = async (values: MyformikValues) => {
+        try {
+            const response = await fetch('/api/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(values)
+            })
+
+            if(response.ok) {
+               
+            } else {
+                console.log('usuario fallido')
+            }
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+
+el la funcion para enviar la data se puede apreciar que estamos haciendo un asyn await el fetch que se esta haciendo es a una ruta:
+api/register/router.ts con esa esctructura hacemos un llamado hacia nuestra base de datos, a continuacion la logica de router.ts
+
+import { NextResponse } from "next/server"
+
+export async function POST(req: any){
+    try {
+        const { username, email, password } = await req.json()
+
+        console.log('usename',username)
+        console.log('email',email)
+        console.log('password',password)
+
+        return NextResponse.json({ message: 'user registered.'}, { status: 201 })
+    } catch (error) {
+       return NextResponse.json({ message: 'An Error Occurred'}, { status: 500 }) 
+    }
+}
+
+se crea la funcion con una funcion declarativa con el nombre de POST, tiene que ser ese tipo de funcion y ese nombre, asi
+next js sabra que es un llamado tipo post dentro se hace un try catch y podemos destructurar lo que hay dentro del parametro
+req, que en nuestro caso seria username, email y password lo que viene dentro del body de nuestra funcion create account que es
+donde esta nuestro form
+
+despues en env.local pegamos la url de mongodb y aggregamos en enlace en config/env.ts
+
+en la carpeta de services/MongoDB/connection/entry-app.ts 
+
+import { connect } from "mongoose";
+import { env } from "app/config/env";
+
+export async function connectMongoDB () {
+    try {
+        await connect(env.MONGO_DB_URL!) //checar porque me da undefined
+        console.log('connected to MongoDB')
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+creamos la funcion para conectarnos a la base de datos
+
+despues creamos un schema y un model para pasar los datos del usuario a la base de datos,
+en la carpeta services/MongoDB/connection/model.ts
+
+import { Schema, model, models } from "mongoose";
+
+interface IUser {
+    username: string,
+    email: string,
+    password: string,
+}
+
+const userSchema = new Schema<IUser>({
+    username: { type: String, required: true},
+    email: {type: String, required: true},
+    password: {type: String, required: true}
+    }, 
+    {timestamps: true}
+)
+
+const User = models.User || model<IUser>('User', userSchema)
+
+export { User }
+
+aqui se puede apreciar el la creacion del model en la linea 148, algo muy importante es que, como en este proyecto llamamos varias veces el mismo model,
+cuando se llama por segunda ocacion en diferente endpoint, trata de sobreescribirlo, porque en la primera llamada, lo compila, y la segunda trata de 
+sobreescribir el model compilado, por lo que da error, para evitarnos ese problema se agrega esto:
+
+const User = models.User || model<IUser>('User', userSchema)
+
+si ya existe User regresame models.user si no, creame un nuevo User
+
+al final el registro queda de esta manera OJO, que use bcrypt para hacer u hash en la contraseña:
+
+import { connectMongoDB } from "app/services/MongoDB/connection/entry-app"
+import { User } from "app/services/MongoDB/connection/model"
+import { NextResponse } from "next/server"
+import bcrypt from "bcryptjs"
+
+export async function POST(req: any){
+    try {
+        const { username, email, password } = await req.json()
+    
+        const hashedPassword = await bcrypt.hash(password, 10)
+        await connectMongoDB()
+        const user = new User({
+            username: username,
+            email: email,
+            password: hashedPassword
+        })
+        await user.save()
+
+        return NextResponse.json({ message: 'user registered.'}, { status: 201 })
+    } catch (error) {
+       return NextResponse.json({ message: 'An Error Occurred'}, { status: 500 }) 
+    }
+}
+
+ahora tenemos que crear una ruta para verificar si el correo ya existe, por lo cual hacemos un nuevo folder con ruta en la carpeta de api
+/api/userExists
+
+
+import { connectMongoDB } from "app/services/MongoDB/connection/entry-app"
+import { User } from "app/services/MongoDB/connection/model"
+import { NextResponse } from "next/server"
+
+export async function POST (req: any) {
+    try {
+        await connectMongoDB()
+        const response = await req.json()
+        const user = await User.findOne({ email: response}).select("_id")
+        if (user) {
+            return NextResponse.json({ user })
+        } else {
+            return NextResponse.json({ message: 'usuario nuevo'})
+        }
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+
+aqui basicamente esta recibiendo el parametro, primero se conecta a la base de datos, despues sacamos el valor del parametro, para hacer un
+filtrado de lo que ya tenemos en la base de datos, en el findOne hay que enviar el valor como objeto, llave-valor, despues si existe hacemos un return 
+de NextResponse para que se pase al otro llamado, basicamente es como un middleware
+
+una vez terminado el componente lo insertamos en el formulario dentro del try catch
+
+'use client'
+import * as yup from 'yup'
+import { Formik, FormikHelpers, Field, Form, ErrorMessage } from "formik"
+import Link from "next/link"
+import { useState } from 'react'
+
+const personSchema = yup.object({
+    username: yup.string().max(20, 'Name must be at least 4 characters.').required(),
+    email: yup.string().required().email('Invalid email address'),
+    password: yup.string().required()
+})
+
+
+interface MyformikValues {
+    username: string,
+    email: string,
+    password: string
+}
+
+const createAccount = () => {
+    const [error, setError] = useState(false)
+
+    const initialValues: MyformikValues = {
+        username: '',
+        email: '',
+        password: ''
+    }
+
+    const dataSubmmitting = async (values: MyformikValues) => {
+        try {
+            const checkEmailExist = await fetch('/api/userExists', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(values.email)
+            })
+
+           const { user } = await checkEmailExist.json()
+
+           if (user) {
+            setError(true)
+            return;
+           } 
+            const response = await fetch('/api/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(values)
+            })
+            if(response.ok) {
+                console.log('todo bien se agrendo usuario')
+            } else {
+                console.log('usuario fallido')
+            }
+           
+        } catch (error) {
+            console.log(error)
+        }
+    }
+    
+    
+    return (
+        <main className="flex justify-center items-center w-screen h-screen">
+            <Formik 
+            initialValues={initialValues} 
+            onSubmit={(values: MyformikValues,
+                { setSubmitting, resetForm }: FormikHelpers<MyformikValues>
+            
+                ) => {
+                    setSubmitting(false)
+                    dataSubmmitting(values)
+                    resetForm({
+                        values: {
+                            username: '',
+                            email: '',
+                            password: ''
+                        }
+                    })
+                }
+            }
+            validationSchema={personSchema} 
+            >
+                <Form className="w-96 rounded-xl shadow-4xl bg-black/5 p-8">
+                    <h1 className="text-4xl font-bold py-2">Register</h1>
+                    <div className="flex flex-col py-2">
+                        <label htmlFor="username" className="text-lg font-semibold">UserName:</label>
+                        <Field type="text" id="username" name="username" className="border px-2 py-1 rounded-lg" placeholder="nombre"/>
+                        <ErrorMessage name='username' />
+                    </div>
+                    <div className="flex flex-col py-2">
+                        <label htmlFor="email" className="text-lg font-semibold">Email:</label>
+                        <Field type="email" id="email" name="email" className="border px-2 py-1 rounded-lg" placeholder="correo"/>
+                        <ErrorMessage name='email'/>
+                    </div>
+                    <div className="flex flex-col py-2">
+                        <label htmlFor="password" className="text-lg font-semibold">Password:</label>
+                        <Field type="password" id="password" name="password" className="border px-2 py-1 rounded-lg" placeholder="contraseña"/>
+                        <ErrorMessage name='password'/>
+                    </div>
+                    <button className='bg-teal-500 w-full py-2 rounded-xl mt-4 mb-2 hover:scale-105 transition duration-300' type="submit">Registrarse</button>
+                    <Link href={'/login'}>
+                        <button className='bg-red-500 w-full py-2 rounded-xl mt-2 hover:scale-105 transition duration-300'>Cancelar</button>
+                    </Link>
+                </Form>
+            </Formik>
+        </main>
+    )
+}
+
+export default createAccount
+
+
+aqui se puede apreciar que primero hacemos validacion con yup de que cumpla requisitos, despues hacemos un fetch checando si ya existe el correo y si existe sale
+de la funcion ejecutora si no, continua en el segundo fetch para crear el usuario
+
+para hacer un redirect se usa el import useRouter from 'next/navigation
+
+despues pasamos a la autenticacion creando la sig estructura
+
+app/api/auth/[...nextauth]/route.ts
+
+MUCHO OJOO TIENE QUE SER EXACTAMENTE ESA RUTAAAAA
+
+
+
+
+-->

@@ -1,0 +1,8 @@
+.effectoBlur {
+    background: rgba(255, 255, 255, 0.23);
+    border-radius: 16px;
+    box-shadow: 0 4px 60px rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4.9px);
+    -webkit-backdrop-filter: blur(4.9px);
+    /* border: 1px solid rgba(255, 255, 255, 0.5); */
+}
