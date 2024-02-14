@@ -18,20 +18,19 @@ const Login = () => {
     const router = useRouter()
     const { data: session } = useSession()
     
-    if( session ) {
-        return router.replace('/store') // esto se modifico recien
-    } 
-    console.log(session)
+    // if( session ) {
+    //     return router.replace('/store') // esto se modifico recien
+    // } 
     const initialValues: Myformiklogin = {
         email: '',
         password: ''
     }
     const sendDataLogin = async (values: Myformiklogin, reset:any) => {
         const { email, password } = values
-        console.log(email, password)
         try {
             const response = await signIn('credentials', {email, password , redirect: false})
             if(response?.error) {
+                console.log(response)
                 setError(true)
                 reset({
                     values: {
@@ -49,7 +48,7 @@ const Login = () => {
     }
     return (
         <main className="w-screen h-screen flex items-center justify-center">
-            <div className="w-96 rounded-xl shadow-4xl bg-black/5 p-8">
+            <div className="w-96 rounded-xl shadow-2xl bg-black/5 p-8">
                 <div className="flex items-center gap-2">
                     <Link href={'/'}>
                         <ChevronLeftIcon className="w-6 cursor-pointer"/>

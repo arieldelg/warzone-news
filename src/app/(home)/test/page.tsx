@@ -6,10 +6,10 @@ const Test = async () => {
     console.log('test, /tesr',session)
     return (
         <div>
-            {
+            {/* {
                 session?.user.role !== 'admin' &&
                 <li>tienes que ser admin para entrar</li>
-            }
+            } */}
     
         </div>
     )

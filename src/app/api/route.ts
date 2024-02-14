@@ -1,4 +1,5 @@
 import { getProducts } from "app/services/shopify/products"
+import { NextResponse } from "next/server"
 
 const GET = async () => {
     const products = await getProducts()

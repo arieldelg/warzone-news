@@ -11,7 +11,8 @@ const nextConfig = {
             protocol: 'https'
         }
     ]
-    }
+    },
+    transpilePackages: ['@mui/x-charts']
 };
 
 export default nextConfig;

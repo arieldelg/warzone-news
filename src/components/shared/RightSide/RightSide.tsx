@@ -19,9 +19,9 @@ const RightSide = () => {
               <Link href={'/login'}>
                 <li className="text-2xl border-white border py-2 px-4 rounded-lg hover:bg-white/30 w-36 text-center font-semibold text-white">Log In</li>
               </Link>
-              <Link href={'/store'}>
+              {/* <Link href={'/store'}>
                 <li className="text-2xl border border-white py-2 px-4 rounded-lg hover:bg-white/30 w-36 text-center font-semibold text-white">Store</li>
-              </Link>
+              </Link> */}
             </ul>
           </nav>
         </section>

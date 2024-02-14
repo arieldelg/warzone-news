@@ -2,7 +2,7 @@
 const AboutUs = () => {
     return (
         <div>
-            About Us
+            <h1>Ariel Del Grande Rodriguez</h1>
         </div>
     )
 }

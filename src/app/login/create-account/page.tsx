@@ -96,7 +96,7 @@ const createAccount = () => {
             }
             validationSchema={personSchema} 
             >
-                <Form className="w-96 rounded-xl shadow-4xl bg-black/5 p-8">
+                <Form className="w-96 rounded-xl shadow-2xl bg-black/5 p-8">
                     <h1 className="text-4xl font-bold py-2">Register</h1>
                     <div className="flex flex-col py-2">
                         <label htmlFor="name" className="text-lg font-semibold">UserName:</label>

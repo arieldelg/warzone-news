@@ -1,10 +1,6 @@
-import { env } from "app/config/env";
-import { connectMongoDB } from "app/services/MongoDB/connection/entry-app";
-import { User } from "app/services/MongoDB/connection/model";
 import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider  from "next-auth/providers/credentials";
-import bcrypt from 'bcryptjs'
-import { signJwtAccesToken } from "app/lib/jwt";
+
 
 const authOptions: NextAuthOptions = {
     providers: [
@@ -13,23 +9,23 @@ const authOptions: NextAuthOptions = {
             credentials: {},
 
             async authorize(credentials) {
-                const { email, password } = credentials
-                try {
-                    await connectMongoDB()
-                    const arrayUser = await User.find({ email })
-                    const user = arrayUser[0]
-                    if(!user.email) {
-                        return null
-                    }    
-                    const passwordMatch = await bcrypt.compare(password, user.password)
-                    if(!passwordMatch) {
-                        return null
-                    } 
+                const response = await fetch('http://localhost:3000/api/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: credentials?.email,
+                        password: credentials?.password
+                    })
+                })
+                const user = await response.json()
+                // console.log('usuario',user)
+                if (user) {
                     return user
-                } catch (error) {
-                    console.log(error)
+                } else {
+                    return null
                 }
-                
             },
         }),
     ],
@@ -42,17 +38,20 @@ const authOptions: NextAuthOptions = {
            
             if (user) {
                 token.role = user.role
+                token.accesToken = user.accesToken
+                token._id = user._id
             } 
-            console.log('user',user)
-            console.log('token',token)
+            // console.log('user async jwt',user)
+            // console.log('token async jwt',token)
             return token
         },
         async session({ session, token }) {
             if(session.user) {
-                session.user.role = token.role
-                session.user.prueba = 'esto es una prueba'
+                session.role = token.role
+                session._id = token._id
+                session.accesToken = token.accesToken
             }
-            console.log('session',session)
+            // console.log('session async session',session)
             return session
         }
     },
@@ -60,9 +59,6 @@ const authOptions: NextAuthOptions = {
     pages: {
         signIn: '/login',
     },
-    events: {
-
-    }
 }
 
 export default authOptions

@@ -1,0 +1,6 @@
+
+.position-table {
+    top: calc(50% + 80px);
+    right: calc(-50% - 55px);
+    /* top: 0 */
+}
