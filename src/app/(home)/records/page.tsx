@@ -9,7 +9,8 @@ const Records = async() => {
     const moneyData = data.map((element: any) => {
         return {
             proyecto: element.nombre_cuenta,
-            money: element.money
+            money: element.money,
+            _id: element._id
         }
     })
     return(

@@ -4,13 +4,16 @@ import { env } from "app/config/env"
 import { getServerSession } from "next-auth"
 import { revalidateTag } from "next/cache"
 import { newRecordMiddleware } from "./newRecordMiddleware"
+import dayjs from "dayjs"
 
 
 const newRecord = async (values:any, moneyData:any) => {
+    console.log(moneyData)
     const session = await getServerSession(authOptions)
     const findProyect = moneyData.find((element:any) => element.proyecto === values.proyecto)
     const split = findProyect.money.split(',').join('')
     const newWallet = Number(split) + Number(values.quantity)
+    console.log(findProyect)
     try {
         const response = await newRecordMiddleware(values.proyecto, newWallet)
         console.log(response)
@@ -32,8 +35,14 @@ const newRecord = async (values:any, moneyData:any) => {
                                 "proyecto": values.proyecto,
                                 "category": values.category,
                                 "descripcion": values.descripcion,
+                                "proyectID": findProyect._id, 
                                 "createdAt": new Date().toLocaleString(),
                                 "updatedAt": new Date().toLocaleString(),
+                                "dayCreatedObject": {
+                                    'day': dayjs().date(),
+                                    'month': dayjs().month(),
+                                    'year': dayjs().year()
+                                },
                                 "user_id": session?._id
                             }
                         })

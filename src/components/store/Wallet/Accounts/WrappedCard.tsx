@@ -12,10 +12,10 @@ export type Data = {
 }
 
 const WrappedCard = ({wallet}: any) => {
-    
     const [optimistic, addOptimisticWallet] = useOptimistic(wallet, (state, addWallet) => {
         return[...state, addWallet]
     })
+    
     return (
         <>
         {

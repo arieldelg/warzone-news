@@ -1,10 +1,11 @@
 'use server'
 import authOptions from "app/app/api/auth/[...nextauth]/options"
 import { env } from "app/config/env"
+import dayjs from "dayjs"
 import { getServerSession } from "next-auth"
 
 
-const getRecordByWallet = async (name: string) => {
+const getRecordByWallet = async (name: string, month: number) => {
     const session = await getServerSession(authOptions)
     try {
         const response = await fetch('https://us-east-1.aws.data.mongodb-api.com/app/data-zagrc/endpoint/data/v1/action/aggregate', {
@@ -28,6 +29,11 @@ const getRecordByWallet = async (name: string) => {
                                 '$match': {
                                     'proyecto': name
                                   } 
+                            },
+                            {
+                                '$match': {
+                                  "dayCreatedObject.month": month
+                                }
                             }
                           ] 
                     }),
@@ -37,14 +43,12 @@ const getRecordByWallet = async (name: string) => {
                 })
                 const { documents } = await response.json()
                 const newData = documents.map((element: any) => {
-                    const {_id, nombre, quantity, proyecto, category, createdAt } = element
+                    const {_id, nombre, quantity, proyecto, category, createdAt, dayCreatedObject } = element
                     const result = {
-                        _id,
-                        nombre,
-                        cantidad: Number(quantity), 
-                        proyecto,
-                        category,
-                        createdAt,
+                        dayCreatedObject,
+                        name: nombre,
+                        money: Number(-quantity), 
+                        category
                     }
                     return result
                 })

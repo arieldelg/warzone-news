@@ -6,6 +6,7 @@ import { ChevronLeftIcon } from '@heroicons/react/24/outline'
 import * as yup from 'yup'
 import { sentData } from 'app/services/MongoDB/actions/sentData'
 import { useRouter } from 'next/navigation'
+import { colors } from 'app/util/colors'
 
 type Wallet = {
     nombre_cuenta: string,
@@ -48,7 +49,7 @@ const AddButtonWallet = ({ addOptimisticWallet, session}: any) => {
             </div>
             {
                 open &&
-            <div className='absolute top-0 left-0  bg-black/50 w-screen h-screen flex justify-center items-center'>
+            <div className='absolute top-0 left-0  bg-black/50 w-screen h-screen flex justify-center items-center z-50'>
                 <div className="bg-white/95 shadow-2xl p-4 w-96 rounded-xl mr-[180px]">
                     <Formik
                     initialValues={initialValues}
@@ -97,15 +98,30 @@ const AddButtonWallet = ({ addOptimisticWallet, session}: any) => {
                                         <Field type='text' placeholder='Escribe aqui' name='nombre_cuenta' id='nombre_cuenta' className='px-2 mx-2 py-1 my-2 rounded-md'/>
                                         <ErrorMessage name="nombre_cuenta"/>
                                     </div>
-                                    <div className="flex flex-col pb-4">
-                                        <label htmlFor="tipo_cuenta" className="text-lg font-semibold px-2">Tipo de Cartera</label> 
-                                        <Field as="select" name="tipo_cuenta" id="tipo_cuenta" className='text-gray-700 px-2 mx-2 mt-2 py-1 rounded-md'>
-                                            <option value=""></option>
-                                            <option value="Nomina">Nomina</option>
-                                            <option value="Cuenta de cheques">Cuenta de Cheques</option>
-                                            <option value="Credito">Credito</option>
-                                            <option value="prestamo">Prestamo</option>
-                                        </Field>
+                                    <div className="flex items-center justify-between pb-4">
+                                        <div>
+                                            <label htmlFor="tipo_cuenta" className="text-lg font-semibold px-2">Tipo de Cartera</label> 
+                                            <Field as="select" name="tipo_cuenta" id="tipo_cuenta" className='text-gray-700 px-2 mx-2 mt-2 py-1 rounded-md'>
+                                                <option value=""></option>
+                                                <option value="Nomina">Nomina</option>
+                                                <option value="Cuenta de cheques">Cuenta de Cheques</option>
+                                                <option value="Credito">Credito</option>
+                                                <option value="prestamo">Prestamo</option>
+                                            </Field>
+                                        </div>
+                                        <div>
+                                            <label htmlFor="color">Color</label>
+                                            <Field as='select' name='color' id='color'>
+                                                <option value=""></option>
+                                                {
+                                                    colors.map((element: string) => {
+                                                        const color = `bg-${element}-500`
+                                                        console.log(color)
+                                                        return <option value={element} key={element} className={color}>{element}</option>
+                                                    })
+                                                }
+                                            </Field>
+                                        </div>
                                     </div>
                                     <div className="flex pb-4 pl-2">
                                         <div>
