@@ -1,9 +1,12 @@
 'use client'
 import { newRecord } from "app/services/MongoDB/actions/newRecord"
 import { Formik, ErrorMessage, Field, Form, FormikHelpers } from "formik"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { XCircleIcon } from '@heroicons/react/24/solid'
 import * as yup from 'yup'
+import { getDataDB } from "app/services/MongoDB/actions/getDataDB"
+import { getOneRecord } from "app/services/MongoDB/actions/getOneRecord"
+import { updateOneRecord } from "app/services/MongoDB/actions/updateOneRecord"
 
 type Record = {
     nombre: string,
@@ -24,17 +27,53 @@ type Value = {
     value: string,
     setValue: React.Dispatch<React.SetStateAction<string>>
 }
-const AddRecord = ({wallet, setOpen, moneyData}: any) => {
+type MoneyData = {
+    proyecto: string,
+    money: string,
+    _id: string
+}
+const AddRecord = ({setOpen, record}: any) => {
+    console.log('record',record)
     const [value, setValue] = useState<Value | unknown>('Gasto')
-    const initialValues: Record ={
-        nombre: '',
-        quantity: '',
-        proyecto: '',
-        category: '',
-        descripcion: ''
+    const [wallet, setWallet] = useState<string[]>([])
+    const [moneyData, setMoneyData] = useState<MoneyData>()
+    let initialValues: Record | any = {}
+    if(!record) {
+        initialValues = {
+            nombre: '',
+            quantity: '',
+            proyecto: '',
+            category: '',
+            descripcion: ''
+        }
+    } else {
+        initialValues = {
+            nombre: record.nombre,
+            quantity: record.quantity,
+            proyecto: record.proyecto,
+            category: record.category,
+            descripcion: record.descripcion
+        }
     }
+    useEffect(() => {
+        const gettingFromServer = async () => {
+        const data = await getDataDB()
+        const wallet = data.map((element: any) => element.nombre_cuenta)
+        setWallet(wallet)
+        const moneyData = data.map((element: any) => {
+            return {
+                proyecto: element.nombre_cuenta,
+                money: element.money,
+                _id: element._id
+            }
+        })
+        setMoneyData(moneyData)
+        
+        }
+        gettingFromServer()
+    }, [])
     return (
-            <div className="absolute bg-black/40 w-full h-full flex justify-center items-center top-0 z-10">
+            <div className="absolute bg-black/40 w-full h-full flex justify-center items-center top-0 z-10 left-0">
                 <div className="bg-white border border-black/50 p-4 w-96 rounded-xl z-50" onClick={(e) => e.stopPropagation()}>
                     <div className="w-full flex justify-between items-center mb-4">
                         <h1 className="text-4xl font-bold">Nuevo Registro</h1>
@@ -61,13 +100,21 @@ const AddRecord = ({wallet, setOpen, moneyData}: any) => {
                         })
                         
                         setOpen((prev: any) => !prev)
-                        await newRecord({
-                            nombre: values.nombre,
-                            quantity: newValue,
-                            proyecto: values.proyecto,
-                            category: values.category,
-                            descripcion: values.descripcion
-                        }, moneyData)
+                        if(!record) {
+                            await newRecord({
+                                nombre: values.nombre,
+                                quantity: newValue,
+                                proyecto: values.proyecto,
+                                category: values.category,
+                                descripcion: values.descripcion
+                            }, moneyData)
+                        } else {
+                            let newValue;
+                            //agregar condicional
+                            console.log(newValue)
+                            console.log(record.descripcion === values.descripcion)
+                            // await updateOneRecord({...values})
+                        }
                     }}
                     validationSchema={RecordSchema}
                     >
@@ -96,11 +143,13 @@ const AddRecord = ({wallet, setOpen, moneyData}: any) => {
                                     value='Gasto'
                                     autoFocus
                                     onClick={(event) => setValue(event.target.value)}
+                                    type="button"
                                     >Gasto</button>
                                     <button 
                                     className={`px-8 py-1 ${value === 'Ingreso'? 'bg-teal-600' : 'bg-teal-500'} rounded-r-md border border-black/20  focus:bg-teal-600 text-lg font-semibold`}
                                     value='Ingreso'
                                     onClick={(event) => setValue(event.target.value)}
+                                    type="button"
                                     >Ingreso</button>
                                 </div>
                             </div>

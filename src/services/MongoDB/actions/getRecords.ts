@@ -4,7 +4,7 @@ import { env } from "app/config/env"
 import { getServerSession } from "next-auth"
 
 
-const getRecord = async () => {
+const getRecords = async () => {
     const session = await getServerSession(authOptions)
     try {
         const response = await fetch('https://us-east-1.aws.data.mongodb-api.com/app/data-zagrc/endpoint/data/v1/action/aggregate', {
@@ -51,4 +51,4 @@ const getRecord = async () => {
     return Response.json({ message: 'getting fetch' })
 }
 
-export { getRecord }
+export { getRecords }

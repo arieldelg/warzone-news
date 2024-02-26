@@ -16,7 +16,7 @@ const Header = ({ wallet, moneyData }: any) => {
             </div>
             {
                 open &&
-                    <AddRecord wallet={wallet} setOpen={setOpen} moneyData={moneyData}/>
+                    <AddRecord setOpen={setOpen}/>
             }
         </div>
     )

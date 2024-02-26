@@ -81,8 +81,7 @@ import { deleteRecordMany } from "app/services/MongoDB/actions/deleteRecordMany"
       }
     })
     await deleteRecordMany(array, moneyData)
-   }
-
+   }  
     return (
       <div>
         <div className="flex items-center py-4">
@@ -170,7 +169,7 @@ import { deleteRecordMany } from "app/services/MongoDB/actions/deleteRecordMany"
         <div className="flex gap-2 justify-between py-4 pr-8 px-4 items-center">
           <div>
           <TrashIcon className="w-10 absolute cursor-pointer hover:text-red-500 transition hover:animate-ping duration-1000" onClick={() => deleteRecord()}/>
-          <TrashIcon className="w-10 cursor-pointer text-red-500 transition hover:animate-ping duration-1000" onClick={() => deleteRecord()}/>
+          <TrashIcon className="w-10 cursor-pointer text-red-500 transition hover:animate-ping duration-1000"/>
           </div>
           <div className="flex items-center gap-2">
             <p>Total:</p>

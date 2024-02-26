@@ -13,6 +13,9 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
   } from "app/components/ui/dropdown-menu"
+import { useEffect, useState } from "react"
+import { AddRecord } from "./addRecord"
+import { getOneRecord } from "app/services/MongoDB/actions/getOneRecord"
 
 export type Record = {
     _id: string
@@ -170,7 +173,20 @@ export const columns: ColumnDef<Record>[] = [
     id: "actions",
     cell: ({ row }) => {
       const payment = row.original
- 
+      const [open, setOpen] = useState(false)
+      const [record, setRecord] = useState({})
+
+      const execute = async (id: string) => {
+        const data = await getOneRecord(id) 
+        setRecord(data)
+        setOpen((prev: boolean) => !prev)
+      }
+      // useEffect(() => {
+      //   const getInfo = async () => {
+          
+      //   }
+      // }, [])
+      
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -187,12 +203,21 @@ export const columns: ColumnDef<Record>[] = [
               Copy payment ID
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>View customer</DropdownMenuItem>
+            <DropdownMenuItem>Clone Record</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => {
+              execute(payment._id)
+              
+              }}>Edit Record</DropdownMenuItem>
             <DropdownMenuItem>View payment details</DropdownMenuItem>
           </DropdownMenuContent>
+            {
+              open &&
+                <AddRecord record={record} setOpen={setOpen}/>
+            }
         </DropdownMenu>
       )
     },
+    
   },
 ]
 

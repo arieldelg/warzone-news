@@ -5,12 +5,11 @@ import { deleteWallet } from 'app/services/MongoDB/actions/deleteWallet'
 import { updateSelectedWallet } from 'app/services/MongoDB/actions/updateSelectedWallet'
 
 const Card = ({ data, wallet }: any ) => {
-    console.log('orange',data.isActive)
-    // console.log('wallet',wallet)
+    const newNumber = Number(data.money).toLocaleString('en-US')
     return (
         <>
             <div 
-            className={`w-48 h-22 min-w-64 ${ data.isActive  ? `bg-${data.color}-500` : 'bg-slate-500'} px-2 py-2 my-2 rounded-xl text-white shadow-2xl hover:scale-105 transition duration-300 cursor-pointer flex justify-between items-center`}
+            className={`w-48 h-22 min-w-64 ${ data.isActive  ? data.colorTailwind : 'bg-slate-500'} px-2 py-2 my-2 rounded-xl text-white shadow-2xl hover:scale-105 transition duration-300 cursor-pointer flex justify-between items-center`}
             onClick={async() => {
                 await updateSelectedWallet(data.nombre_cuenta, wallet)
             }}
@@ -21,7 +20,7 @@ const Card = ({ data, wallet }: any ) => {
                         <p className='text-xl font-semibold'>{data.nombre_cuenta}</p>
                         <p className='text-sm'>({data.tipo_cuenta})</p>
                         <div className="flex flex-row gap-2">
-                            <p>${data.money}</p>
+                            <p>${newNumber}</p>
                             <p>{[data.tipo_moneda]}</p>
                         </div>
                     </div>
