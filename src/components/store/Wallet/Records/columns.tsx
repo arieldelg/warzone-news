@@ -13,9 +13,11 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
   } from "app/components/ui/dropdown-menu"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { AddRecord } from "./addRecord"
 import { getOneRecord } from "app/services/MongoDB/actions/getOneRecord"
+import { newRecord } from "app/services/MongoDB/actions/newRecord"
+import dayjs from "dayjs"
 
 export type Record = {
     _id: string
@@ -176,17 +178,17 @@ export const columns: ColumnDef<Record>[] = [
       const [open, setOpen] = useState(false)
       const [record, setRecord] = useState({})
 
-      const execute = async (id: string) => {
+
+      const execute = async (id: string, edit?: boolean) => {
         const data = await getOneRecord(id) 
         setRecord(data)
-        setOpen((prev: boolean) => !prev)
+        if(edit) {
+          setOpen((prev: boolean) => !prev)
+        }
+        if(!edit) {
+          await newRecord(data)
+        }
       }
-      // useEffect(() => {
-      //   const getInfo = async () => {
-          
-      //   }
-      // }, [])
-      
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -197,22 +199,20 @@ export const columns: ColumnDef<Record>[] = [
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(payment._id)}
-            >
-              Copy payment ID
-            </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Clone Record</DropdownMenuItem>
             <DropdownMenuItem onClick={() => {
-              execute(payment._id)
-              
-              }}>Edit Record</DropdownMenuItem>
+              execute(payment._id, false)
+              }}
+            >Clone Record</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => {
+              execute(payment._id, true)
+              }}
+            >Edit Record</DropdownMenuItem>
             <DropdownMenuItem>View payment details</DropdownMenuItem>
           </DropdownMenuContent>
             {
               open &&
-                <AddRecord record={record} setOpen={setOpen}/>
+                <AddRecord record={record} setOpen={setOpen} id={payment._id}/>
             }
         </DropdownMenu>
       )

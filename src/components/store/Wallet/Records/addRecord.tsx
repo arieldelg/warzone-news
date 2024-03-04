@@ -32,11 +32,11 @@ type MoneyData = {
     money: string,
     _id: string
 }
-const AddRecord = ({setOpen, record}: any) => {
+const AddRecord = ({setOpen, record, id}: any) => {
     console.log('record',record)
     const [value, setValue] = useState<Value | unknown>('Gasto')
     const [wallet, setWallet] = useState<string[]>([])
-    const [moneyData, setMoneyData] = useState<MoneyData>()
+    // const [moneyData, setMoneyData] = useState<MoneyData>()
     let initialValues: Record | any = {}
     if(!record) {
         initialValues = {
@@ -60,14 +60,14 @@ const AddRecord = ({setOpen, record}: any) => {
         const data = await getDataDB()
         const wallet = data.map((element: any) => element.nombre_cuenta)
         setWallet(wallet)
-        const moneyData = data.map((element: any) => {
-            return {
-                proyecto: element.nombre_cuenta,
-                money: element.money,
-                _id: element._id
-            }
-        })
-        setMoneyData(moneyData)
+        // const moneyData = data.map((element: any) => {
+        //     return {
+        //         proyecto: element.nombre_cuenta,
+        //         money: element.money,
+        //         _id: element._id
+        //     }
+        // })
+        // setMoneyData(moneyData)
         
         }
         gettingFromServer()
@@ -107,13 +107,9 @@ const AddRecord = ({setOpen, record}: any) => {
                                 proyecto: values.proyecto,
                                 category: values.category,
                                 descripcion: values.descripcion
-                            }, moneyData)
+                            })
                         } else {
-                            let newValue;
-                            //agregar condicional
-                            console.log(newValue)
-                            console.log(record.descripcion === values.descripcion)
-                            // await updateOneRecord({...values})
+                            await updateOneRecord({...values}, id)
                         }
                     }}
                     validationSchema={RecordSchema}

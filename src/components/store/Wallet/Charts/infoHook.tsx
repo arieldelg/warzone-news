@@ -25,26 +25,45 @@ const infoHook = (name: string[]) => {
         setMonth(array)
         const getInfo = async () => {
             const response = await getRecordByWallet(name[0], today.$M)
+            // let newData: any[] = []
+            // let day: any[] = [];
+            // let newResponse = [...response]
+            // newResponse.forEach((element: any) => {
+            //     if(!day.includes(element.dayCreatedObject.day)) {
+            //         newData.push({
+            //             day: element.dayCreatedObject.day,
+            //             category: element.category
+            //         })
+            //     }
+            // })
+            // let calendar: any[] = []
+            // day.forEach((element: any) => {
+            //     response.forEach((element2: any) => {
+                    
+            //         if(element2.dayCreatedObject.day === element) {
+
+            //         }
+            //     });
+            // })
+            // console.log(newData)
+            // console.log(day)
             setWalletByMonth(response)
         }
         getInfo()
         return () => {  }
     }, [name, today])
+    // console.log(walletByMonth)
     const series = walletByMonth.map((element: any) => {
         const emptyArray = [...newArray]
         emptyArray[element.dayCreatedObject.day - 1] = element.money
-        return { data: emptyArray, label: element.name, stack: 'stack2', valueFormatter(value: number) {
+        return { data: emptyArray, label: element.category, stack: 'stack2', valueFormatter(value: number) {
             if(value !== undefined) {
                 return `${value}$`
             }
-            }
+            },
+        
         }
     })
-    // const todayWallet = walletName.concat(walletByMonth)
-    // const datasetArray = todayWallet.map((element: any) => {
-        //     return { data: element.name, stack: 'A'}
-        // })
-       
     return { series, month, setToday, today, day, setMonth }
 }
 

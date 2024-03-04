@@ -5,15 +5,22 @@ import { getServerSession } from "next-auth"
 import { revalidateTag } from "next/cache"
 import { newRecordMiddleware } from "./newRecordMiddleware"
 import dayjs from "dayjs"
+import { getDataDB } from "./getDataDB"
 
 
-const newRecord = async (values:any, moneyData:any) => {
-    console.log(moneyData)
+const newRecord = async (values:any) => {
     const session = await getServerSession(authOptions)
+    const data = await getDataDB()
+    const moneyData = data.map((element: any) => {
+        return {
+            proyecto: element.nombre_cuenta,
+            money: element.money,
+            _id: element._id
+        }
+    })
     const findProyect = moneyData.find((element:any) => element.proyecto === values.proyecto)
     const split = findProyect.money.split(',').join('')
     const newWallet = Number(split) + Number(values.quantity)
-    console.log(findProyect)
     try {
         const response = await newRecordMiddleware(values.proyecto, newWallet)
         console.log(response)
